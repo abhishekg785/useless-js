@@ -4,6 +4,21 @@
  * Gives you the unused js files in the project using webpack --json
 */
 
+const path = require('path');
+const glob = require('glob');
+
+const cwd = process.cwd();
+
+const argv = require('yargs')
+  .alias('s', 'src')
+  .describe('s', 'Source Directory of the files')
+  .default('s', '.')
+  .argv;
+
+const srcDir = path.resolve(argv.src);
+
+// const srcDir = path.resolve(argv);
+
 function readWebpackDataInput() {
 
   return new Promise((resolve, reject) => {
@@ -47,15 +62,47 @@ function readWebpackDataInput() {
   });
 }
 
-async function getLocalFiles(modules) {
-  modules.filter((module) => {
-    console.log(module.name);
-  })
+// get only the local files
+const isFileLocal = (filePath) => {
+  return (filePath.indexOf('./') === 0 && filePath.indexOf('./~/') === -1);
+}
+
+async function getUsedFiles(modules) {
+  return modules.filter(module => isFileLocal(module.name)).map(module => path.join(cwd, module.name));
+}
+
+function getDirFiles() {
+  return new Promise((resolve, reject) => {
+    glob('!(node_modules)/**/*.*', {
+      cwd: srcDir
+    }, (err, files) => {
+      if(err) {
+        reject(err);
+      }
+      resolve(files.map(file => path.join(srcDir, file)));
+    });
+  });
+}
+
+function getUnusedFiles(usedFilesArr, dirFilesArr) {
+  return new Promise((resolve, reject) => {
+    resolve(dirFilesArr.filter(file => usedFilesArr.indexOf(file) === -1));
+  });
 }
 
 (async () => {
   let data = await readWebpackDataInput();
 
   let modules = data.modules;
-  let localFiles = await getLocalFiles(modules);
+  let usedFilesArr = await getUsedFiles(modules);
+  let dirFilesArr = await getDirFiles();
+
+  // we have the used files arr and dir file arr,
+  // now we can simply compare here
+  let unused = await getUnusedFiles(usedFilesArr, dirFilesArr);
+
+  console.log('****************************** Here are your unused file! I maybe wrong :P ******************************\n');
+  console.log(unused.join('\n'));
 })();
+
+getDirFiles();
