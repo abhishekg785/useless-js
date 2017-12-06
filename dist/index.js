@@ -17,8 +17,6 @@ const argv = require('yargs')
 
 const srcDir = path.resolve(argv.src);
 
-// const srcDir = path.resolve(argv);
-
 function readWebpackDataInput() {
 
   return new Promise((resolve, reject) => {
@@ -104,5 +102,3 @@ function getUnusedFiles(usedFilesArr, dirFilesArr) {
   console.log('****************************** Here are your unused file! I maybe wrong :P ******************************\n');
   console.log(unused.join('\n'));
 })();
-
-getDirFiles();

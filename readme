@@ -1,0 +1,25 @@
+unused-files
+------------
+
+This does only one thing and i.e to get the unused files in your front-end code.
+
+Using webpack --json, to get the files being used, we can identify the files which are not in use.
+
+
+Steps to Run:
+It uses webpack --json to work.
+
+So simply run :
+
+webpack --json | <path-to-my-script>/index.js
+
+by default, it will take the current dir to fetch the source files to work on.
+
+you can even specify path like :
+
+webpack --json | <path-to-my-script>/index.js --src '<path-to-the-dir-to-fetch-the-files-to-work-on'
+
+
+Note:
+This MAY work or MAY NOT work :P
+The main reason i created this is due to this thing called 'process' in Node.JS, a very fascinating thing in Node.JS.
